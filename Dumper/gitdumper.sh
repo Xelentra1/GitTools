@@ -17,23 +17,21 @@ function init_header() {
 EOF
 }
 
-# get_arg "--git-dir=" ".git" "GITDIR" "$@" for "--git-dir=asd"
+# get_git_dir "$@" for "--git-dir=asd"
 # returns asd in GITDIR
-function get_arg() {
-    local KEY=$1
-    local DEFAULT=$2
-    declare -n ret=$3
-    local ARGS=${@:4}
+function get_git_dir() {
+    local FLAG="--git-dir="
+    local ARGS=${@}
 
     for arg in $ARGS
     do
-        if [[ $arg == $KEY* ]]; then
-            ret="${arg#$KEY}"
+        if [[ $arg == $FLAG* ]]; then
+            echo "${arg#$FLAG}"
             return
         fi
     done
 
-   ret="$DEFAULT"
+    echo ".git"
 }
 
 init_header
@@ -43,24 +41,24 @@ QUEUE=();
 DOWNLOADED=();
 BASEURL="$1";
 BASEDIR="$2";
-get_arg "--git-dir=" ".git" "GITDIR" "$@"
+GITDIR=$(get_git_dir "$@")
 BASEGITDIR="$BASEDIR/$GITDIR/";
 
 if [ $# -lt 2 ]; then
-    echo -e "\e[33m[*] USAGE: http://target.tld/.git/ dest-dir [--git-dir=otherdir]\e[0m";
+    echo -e "\033[33m[*] USAGE: http://target.tld/.git/ dest-dir [--git-dir=otherdir]\033[0m";
     echo -e "\t\t--git-dir=otherdir\t\tChange the git folder name. Default: .git"
     exit 1;
 fi
 
 
 if [[ ! "$BASEURL" =~ /$GITDIR/$ ]]; then
-    echo -e "\e[31m[-] /$GITDIR/ missing in url\e[0m";
+    echo -e "\033[31m[-] /$GITDIR/ missing in url\033[0m";
     exit 0;
 fi
 
 if [ ! -d "$BASEGITDIR" ]; then
-    echo -e "\e[33m[*] Destination folder does not exist\e[0m";
-    echo -e "\e[32m[+] Creating $BASEGITDIR\e[0m";
+    echo -e "\033[33m[*] Destination folder does not exist\033[0m";
+    echo -e "\033[32m[+] Creating $BASEGITDIR\033[0m";
     mkdir -p "$BASEGITDIR";
 fi
 
@@ -117,10 +115,10 @@ function download_item() {
     #Mark as downloaded and remove it from the queue
     DOWNLOADED+=("$objname")
     if [ ! -f "$target" ]; then
-        echo -e "\e[31m[-] Downloaded: $objname\e[0m"
+        echo -e "\033[31m[-] Downloaded: $objname\033[0m"
         return
     fi
-    echo -e "\e[32m[+] Downloaded: $objname\e[0m"
+    echo -e "\033[32m[+] Downloaded: $objname\033[0m"
 
     #Check if we have an object hash
     if [[ "$objname" =~ /[a-f0-9]{2}/[a-f0-9]{38} ]]; then 
